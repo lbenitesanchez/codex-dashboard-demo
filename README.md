@@ -14,6 +14,11 @@ Interactive Streamlit dashboard designed to be developed and extended using Code
 - `src/`   : reusable functions (data loading, plots, UI helpers)
 - `data/`  : datasets (optional). If absent, the app can simulate sample data.
 
+## Modular structure
+The dashboard is split into small, focused modules: `src/data_loader.py` owns data creation/loading,
+`src/plots.py` owns Plotly chart construction, and `app.py` coordinates layout and user interaction.
+This keeps logic isolated for teaching and makes it easier to extend without changing the UI wiring.
+
 ## How to run locally
 ```bash
 python -m venv .venv

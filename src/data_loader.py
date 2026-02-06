@@ -2,6 +2,7 @@ import pandas as pd
 
 
 def load_sales_data() -> pd.DataFrame:
+    """Return the sample monthly sales dataset used by the dashboard."""
     return pd.DataFrame(
         {
             "month": pd.date_range("2025-01-01", periods=12, freq="MS").strftime("%Y-%m"),

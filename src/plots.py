@@ -3,6 +3,7 @@ import plotly.express as px
 
 
 def make_monthly_sales_line(df: pd.DataFrame, color_by_region: bool) -> "px.Figure":
+    """Build the monthly sales line chart for the provided dataset."""
     return px.line(
         df,
         x="month",
@@ -14,6 +15,7 @@ def make_monthly_sales_line(df: pd.DataFrame, color_by_region: bool) -> "px.Figu
 
 
 def make_sales_by_region_bar(df: pd.DataFrame) -> "px.Figure":
+    """Build the total sales by region bar chart for the provided dataset."""
     grouped = df.groupby("region", as_index=False)["sales"].sum()
     return px.bar(
         grouped,
