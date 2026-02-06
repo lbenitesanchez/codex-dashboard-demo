@@ -1,6 +1,7 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
+
+from src.data_loader import load_sales_data
+from src.plots import make_monthly_sales_line, make_sales_by_region_bar
 
 st.set_page_config(page_title="Codex Streamlit Demo", layout="wide")
 
@@ -8,20 +9,25 @@ st.title("Codex Streamlit Dashboard Demo")
 st.caption("Minimal scaffold: data + filter + chart")
 
 # ---- Sample data (can be replaced later) ----
-df = pd.DataFrame({
-    "month": pd.date_range("2025-01-01", periods=12, freq="MS").strftime("%Y-%m"),
-    "region": ["North", "South", "East", "West"] * 3,
-    "sales": [120, 80, 95, 110, 140, 75, 105, 125, 160, 90, 115, 135],
-})
+df = load_sales_data()
 
 # ---- Sidebar filters ----
 st.sidebar.header("Filters")
-region = st.sidebar.selectbox("Region", ["All"] + sorted(df["region"].unique().tolist()))
+regions = sorted(df["region"].unique().tolist())
+selected_regions = st.sidebar.multiselect("Regions", regions, default=regions)
 
-if region != "All":
-    df_plot = df[df["region"] == region].copy()
+if selected_regions:
+    df_plot = df[df["region"].isin(selected_regions)].copy()
 else:
-    df_plot = df.copy()
+    df_plot = df.iloc[0:0].copy()
+
+csv_data = df_plot.to_csv(index=False)
+st.sidebar.download_button(
+    "Download CSV",
+    data=csv_data,
+    file_name="filtered_sales.csv",
+    mime="text/csv",
+)
 
 # ---- Main layout ----
 c1, c2 = st.columns(2)
@@ -31,9 +37,11 @@ with c1:
 with c2:
     st.metric("Total sales", int(df_plot["sales"].sum()))
 
-fig = px.line(df_plot, x="month", y="sales", color="region" if region == "All" else None,
-              markers=True, title="Monthly sales")
-st.plotly_chart(fig, use_container_width=True)
+line_fig = make_monthly_sales_line(df_plot, color_by_region=len(selected_regions) != 1)
+st.plotly_chart(line_fig, use_container_width=True)
+
+bar_fig = make_sales_by_region_bar(df_plot)
+st.plotly_chart(bar_fig, use_container_width=True)
 
 with st.expander("Preview data"):
     st.dataframe(df_plot, use_container_width=True)
